@@ -3,7 +3,7 @@ import {findGame, insertIntoGame} from '../controllers/games.controllers.js';
 
 const router = Router();
 
-router.get('/categories', findGame);
-router.post('/categories', insertIntoGame);
+router.get('/games', findGame);
+router.post('/games', insertIntoGame);
 
 export default router;
