@@ -2,6 +2,9 @@ import customersSchema from "../schemas/customers.schema.js";
 import dayjs from "dayjs";
 
 async function validationMiddleware (req, res, next){
+    const validationSchema = customersSchema.validate(req.body);    
+        if(validationSchema.error) return res.sendStatus(400);
+
     const currentDate = dayjs().format('YYYY-MM-DD');
 
     const currentDateArray=currentDate.split('-');
@@ -17,6 +20,9 @@ async function validationMiddleware (req, res, next){
     const birthdayYear = birthdayArray[0];
     const birthdayMonth = birthdayArray[1];
     const birthdayDay = birthdayArray[2];
+        if( birthdayYear.length !== 4 ||
+            birthdayMonth.length !== 2 ||
+            birthdayDay.length !== 2) return res.sendStatus(400)
 
     const age = currentYear - birthdayYear;
         if(age<=17) return res.status(400).send("Usuário menor de idade");
@@ -29,9 +35,6 @@ async function validationMiddleware (req, res, next){
                 return res.status(400).send("Usuário menor de idade");
             }
         }
-
-    const validationSchema = customersSchema.validate(req.body);    
-        if(validationSchema.error) return res.sendStatus(400);
     
     res.locals = req.body;
     next();  
