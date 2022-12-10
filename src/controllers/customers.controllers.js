@@ -25,7 +25,20 @@ async function listCustormers (req,res){
 };
 
 async function findCustormers (req,res){
+    const {id} = req.params;
 
+    try {
+        const findCustormers = await connection.query(`
+        SELECT * FROM custormers WHERE id=$1
+        `,[id]);
+
+        if (findCustormers.rows.length){
+            return res.status(200).send(findCustormers.rows[0]);
+        }
+        res.sendStatus(404);
+    } catch (error) {
+        res.sendStatus(500);
+    }
 };
 
 async function insertIntoCustormers (req,res){
