@@ -7,6 +7,6 @@ const router = Router();
 router.get('/customers', listCustomers);
 router.get('/customers/:id', findCustomers);
 router.post('/customers', validationMiddleware, insertIntoCustomers);
-router.put('/customers/:id', updateCustomers);
+router.put('/customers/:id', validationMiddleware, updateCustomers);
 
 export default router;

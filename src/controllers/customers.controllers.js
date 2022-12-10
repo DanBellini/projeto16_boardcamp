@@ -65,12 +65,38 @@ async function insertIntoCustomers (req,res){
     } catch (error) {
         res.sendStatus(500);
     }
-
-
 };
 
 async function updateCustomers (req,res){
+    const {id} = req.params;
+    const {
+        name,
+        phone,
+        cpf,
+        birthday
+    } = res.locals;
 
+    try {
+        const duplicateCpf = await connection.query(`
+            SELECT * FROM customers WHERE cpf=$1;
+        `,[cpf]);
+            if(duplicateCpf.rows[0].id !== Number(id)) return res.sendStatus(409);
+
+        await connection.query(`
+            UPDATE
+                customers
+            SET
+                name=$1,
+                phone=$2,
+                cpf=$3,
+                birthday=$4
+            WHERE
+                id=$5
+        `,[name, phone, cpf, birthday, id]);
+        res.sendStatus(200);
+    } catch (error) {
+        res.sendStatus(500);
+    }
 };
 
 export {listCustomers, findCustomers, insertIntoCustomers, updateCustomers};
