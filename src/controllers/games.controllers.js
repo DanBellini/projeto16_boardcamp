@@ -1,5 +1,5 @@
 import connection from '../database/db.js';
-import gameSchema from '../Schemas/games.schema.js';
+import gameSchema from '../schemas/games.schema.js';
 
 async function findGame (req,res){
     const {name} = req.query;

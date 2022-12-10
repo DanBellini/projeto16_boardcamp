@@ -1,11 +1,11 @@
 import connection from "../database/db.js";
 
-async function listCustormers (req,res){
+async function listCustomers (req,res){
     const {cpf} = req.query;
-    let findCustormers;
+    let findCustomers;
     try {
         if(cpf){
-            findCustormers = await connection.query(`
+            findCustomers = await connection.query(`
             SELECT * FROM 
                 customers
             WHERE
@@ -14,26 +14,26 @@ async function listCustormers (req,res){
                 $1;
             `, [cpf + '%']);
         } else {
-            findCustormers = await connection.query(`
+            findCustomers = await connection.query(`
             SELECT * FROM customers;
             `);
         }
-        res.sendStatus(findCustormers.rows);
+        res.sendStatus(findCustomers.rows);
     } catch (error) {
         res.sendStatus(500);
     }
 };
 
-async function findCustormers (req,res){
+async function findCustomers (req,res){
     const {id} = req.params;
 
     try {
-        const findCustormers = await connection.query(`
-        SELECT * FROM custormers WHERE id=$1
+        const findCustomers = await connection.query(`
+        SELECT * FROM Customers WHERE id=$1
         `,[id]);
 
-        if (findCustormers.rows.length){
-            return res.status(200).send(findCustormers.rows[0]);
+        if (findCustomers.rows.length){
+            return res.status(200).send(findCustomers.rows[0]);
         }
         res.sendStatus(404);
     } catch (error) {
@@ -41,12 +41,36 @@ async function findCustormers (req,res){
     }
 };
 
-async function insertIntoCustormers (req,res){
+async function insertIntoCustomers (req,res){
+    const {
+        name,
+        phone,
+        cpf,
+        birthday
+    } = res.locals;
+
+    try {
+        const duplicateCpf = await connection.query(`
+            SELECT * FROM customers WHERE cpf=$1;
+        `,[cpf]);
+        if(duplicateCpf.rows[0]) return res.sendStatus(409);
+
+        await connection.query(`
+            INSERT INTO customers 
+                (name, phone, cpf, birthday)
+            VALUES
+                ($1, $2, $3, $4);
+        `,[name, phone, cpf, birthday]);
+        res.sendStatus(201);
+    } catch (error) {
+        res.sendStatus(500);
+    }
+
 
 };
 
-async function updateCustormers (req,res){
+async function updateCustomers (req,res){
 
 };
 
-export {listCustormers, findCustormers, insertIntoCustormers, updateCustormers};
+export {listCustomers, findCustomers, insertIntoCustomers, updateCustomers};
