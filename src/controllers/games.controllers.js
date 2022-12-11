@@ -18,7 +18,7 @@ async function findGame (req,res){
             WHERE
                 name
             LIKE 
-                '$1%'
+                '$1%';
             `,[name]
         );
         res.send(findGame.rows);
