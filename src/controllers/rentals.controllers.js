@@ -175,12 +175,29 @@ async function finishRentals (req,res){
 
         res.sendStatus(200);
     } catch (error) {
-        res.send(500);
+        res.sendStatus(500);
     }
 };
 
 async function deleteRentals (req,res){
+    const {id} = req.params;
 
+    try {
+        const selectRentals = await connection.query(`
+            SELECT * FROM rentals WHERE id = $1;
+        `,[id]);
+
+        if(!selectRentals.rows.length) return res.sendStatus(404);
+        if(selectRentals.rows[0].returnDate) return res.sendStatus(400);
+
+        await connection.query(`
+            DELETE FROM rentals WHERE id=$1;
+        `,[id]);
+        
+        res.sendStatus(200);
+    } catch (error) {
+        res.sendStatus(500);
+    }
 };
 
 export {listRentals, insertIntoRentals, finishRentals, deleteRentals};

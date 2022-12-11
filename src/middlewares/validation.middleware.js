@@ -7,7 +7,7 @@ function validationMiddleware (req, res, next){
 
         const dateNow = dayjs().format('YYYY-MM-DD');
         const yearDiferrence = birthday.diff(dateNow, "year", true);
-        if(yearDiferrence<18) return res.status(400).send("Usuário menor de idade");
+        if(yearDiferrence > -18) return res.status(400).send("Usuário menor de idade");
     
     res.locals = req.body;
     next();  
