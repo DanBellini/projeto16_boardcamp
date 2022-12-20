@@ -2,23 +2,23 @@ import connection from "../database/db.js";
 
 async function listCustomers (req,res){
     const {cpf} = req.query;
-    let findCustomers;
     try {
         if(cpf){
-            findCustomers = await connection.query(`
+            const findCustomers = await connection.query(`
             SELECT * FROM 
                 customers
             WHERE
                 cpf
             LIKE
-                $1;
-            `, [cpf + '%']);
-        } else {
-            findCustomers = await connection.query(`
+                $1
+            `, [`${cpf}%`]);
+            return res.send(findCustomers.rows).status(200)
+        } 
+
+        const findCustomers = await connection.query(`
             SELECT * FROM customers;
-            `);
-        }
-        res.sendStatus(findCustomers.rows);
+        `);
+        res.send(findCustomers.rows).status(200);
     } catch (error) {
         res.sendStatus(500);
     }

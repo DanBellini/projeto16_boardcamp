@@ -5,8 +5,9 @@ async function listRentals (req,res){
     const {customersId, gameId} = req.query;
 
     try {
+        console.log(customersId)
         if(customersId){
-            const listRentals = connection.query(`
+            const findRentals = await connection.query(`
                 SELECT
                     rentals.*,
                     customers.id
@@ -33,12 +34,12 @@ async function listRentals (req,res){
                 JOIN categories
                     ON games."categoryId" = categories.id
                     WHERE
-                    rentals."customersId" = $1;
+                    rentals."customerId" = $1
             `, [customersId]);
-            res.send(listRentals.rows);
+            return res.send(findRentals.rows);
         }
         if(gameId){
-            const listRentals = connection.query(`
+            const findRentals = await connection.query(`
                 SELECT
                     rentals.*,
                     customers.id
@@ -65,11 +66,11 @@ async function listRentals (req,res){
                 JOIN categories
                     ON games."categoryId" = categories.id
                     WHERE
-                    rentals."gameId" = $1;
+                    rentals."gameId" = $1
             `, [gameId]);
-            res.send(listRentals.rows);
+            return res.send(findRentals.rows);
         };
-        const listRentals = connection.query(`
+        const listRentals = await connection.query(`
             SELECT
                 rentals.*,
                 customers.id
@@ -96,22 +97,22 @@ async function listRentals (req,res){
             JOIN categories
                 ON games."categoryId" = categories.id;
             `);
-        res.send(listRentals.rows);
+        return res.send(listRentals.rows).status(200);
     } catch (error) {
         res.sendStatus(500);
     }
 };
 
 async function insertIntoRentals (req,res){
-    const {customersId, gameId, daysRented} = req.body;
+    const {customerId, gameId, daysRented} = req.body;
 
     try {
         const idCustomers = await connection.query(`
             SELECT * FROM customers WHERE id = $1;
-        `,[customersId]);
+        `,[customerId]);
 
         const idGame = await connection.query(`
-            SELECT * FROM customers WHERE id = $1;
+            SELECT * FROM games WHERE id = $1;
         `, [gameId]);
 
         const rentDate = dayjs().format('YYYY-MM-DD');
@@ -120,22 +121,24 @@ async function insertIntoRentals (req,res){
 
         const returnDate = null;
 
+        
         const pricePerDayGame = idGame.rows[0].pricePerDay * daysRented;
 
         const delayfee = null;
 
+        
         await connection.query(`
             INSERT INTO rentals (
-                "customersId",
+                "customerId",
                 "gameId",
                 "rentDate",
                 "daysRented",
                 "returnDate",
                 "originalPrice",
                 "delayFee")
-            VALUES ($1,$2,$3,$4,$5,$6,$7);
-        `,[customersId, gameId, rentDate, daysRented, returnDate, pricePerDayGame, delayfee]);
-
+            VALUES ($1,$2,$3,$4,$5,$6,$7)
+        `,[customerId, gameId, rentDate, daysRented, returnDate, pricePerDayGame, delayfee]);
+    
         res.sendStatus(201);
     } catch (error) {
         res.sendStatus(500);
@@ -170,7 +173,7 @@ async function finishRentals (req,res){
                 "returnDate"=$1,
                 "delayFee"=$2
             WHERE 
-                id=$3;
+                id=$3
         `,[returnDate, calcDelayfee, id]);
 
         res.sendStatus(200);

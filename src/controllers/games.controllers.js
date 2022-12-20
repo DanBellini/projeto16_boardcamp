@@ -5,8 +5,8 @@ async function findGame (req,res){
     const {name} = req.query;
 
     try {
-        const findGame = await connection.query(`
-            SELECT
+        const findGame = await connection.query(` 
+        SELECT
                 games.*, 
                 categories.name AS "categoriesName"
             FROM
@@ -16,10 +16,10 @@ async function findGame (req,res){
             ON
                 games."categoryId" = categories.id
             WHERE
-                name
+                games.name
             LIKE 
-                '$1%';
-            `,[name]
+                $1
+            `,[`${name}%`]
         );
         res.send(findGame.rows);
     } catch (error) {
@@ -37,6 +37,7 @@ async function insertIntoGame (req,res){
     } = req.body
 
     const validationSchema = gameSchema.validate(req.body);
+    console.log(validationSchema.error)
 
     if(validationSchema.error) return res.sendStatus(400);
 
